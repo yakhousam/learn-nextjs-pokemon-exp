@@ -1,3 +1,4 @@
+import Link from "next/link";
 // these are the endpoints we will use
 // -https://pokeapi.co/api/v2/pokemon
 // -https://pokeres.bastionbot.org/images/pokemon/1.png
@@ -7,32 +8,33 @@
 // Every Pokemon card will have the name, picture, their number, and their type
 // For styling, only use styled-jsx that came with nextjs
 
-function Home({ posts }) {
-  console.log(posts.results, "posts");
+function Home({ pokemons }) {
+  console.log(pokemons);
+  const { results } = pokemons;
   return (
     <>
-      <h1>Learn next.js: pokemon example</h1>
-      <h2>Pokiemons :</h2>
+      <h1>Pokiemons</h1>
       <ul>
-        {posts.results.map((pokiemon) => (
-          <li>{pokiemon.name}</li>
+        {results.map((pokiemon, idx) => (
+          <li key={idx}>
+            <Link href={`/pokemon/${idx + 1}`}>
+              <a>
+                {idx + 1}. {pokiemon.name}
+              </a>
+            </Link>
+          </li>
         ))}
       </ul>
     </>
   );
 }
 
-// This function gets called at build time
 export async function getStaticProps() {
-  // Call an external API endpoint to get posts
   const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-  const posts = await res.json();
-
-  // By returning { props: { posts } }, the Blog component
-  // will receive `posts` as a prop at build time
+  const pokemons = await res.json();
   return {
     props: {
-      posts,
+      pokemons,
     },
   };
 }
