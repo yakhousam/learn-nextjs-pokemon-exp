@@ -4,7 +4,7 @@ const pokemon = ({ pokemon, number }) => {
   console.log("in the pokemon page:", pokemon);
   const { types } = pokemon;
   return (
-    <div>
+    <div className="card">
       <h1 className="title">{pokemon.name}</h1>
       <img
         src={`https://pokeres.bastionbot.org/images/pokemon/${number}.png`}

@@ -12,25 +12,26 @@ function Home({ pokemons }) {
   console.log(pokemons);
   const { results } = pokemons;
   return (
-    <>
-      <h1 className="title">Pokiemons</h1>
-      <p className="description">click on a pokemon to view his page</p>
-      <div className="grid">
-        <ul className="no-bullets">
-          {results.map((pokiemon, idx) => (
-            <li key={idx}>
-              <Link href={`/pokemon/${idx + 1}`} className="card">
-                <a>
-                  <h3>
-                    {idx + 1}. {pokiemon.name}
-                  </h3>
-                </a>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
+    <div className="container">
+      <main>
+        <h1 className="title">Pokiemons</h1>
+        <p className="description">click on a pokemon to view his page</p>
+        <div className="">
+          <ul className="no-bullets grid">
+            {results.map((pokiemon, idx) => (
+              <li key={idx} className="card">
+                <Link href={`/pokemon/${idx + 1}`}>
+                  <a>
+                    <h3>
+                      {idx + 1}. {pokiemon.name}
+                    </h3>
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </main>
       <style jsx>{`
         .container {
           min-height: 100vh;
@@ -182,7 +183,7 @@ function Home({ pokemons }) {
           box-sizing: border-box;
         }
       `}</style>
-    </>
+    </div>
   );
 }
 
