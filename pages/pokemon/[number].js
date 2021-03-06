@@ -5,7 +5,7 @@ const pokemon = ({ pokemon, number }) => {
   const { types } = pokemon;
   return (
     <div>
-      <h1>{pokemon.name}</h1>
+      <h1 className="title">{pokemon.name}</h1>
       <img
         src={`https://pokeres.bastionbot.org/images/pokemon/${number}.png`}
         alt={pokemon.name}
