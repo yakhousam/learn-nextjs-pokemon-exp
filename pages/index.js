@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 // these are the endpoints we will use
 // -https://pokeapi.co/api/v2/pokemon
 // -https://pokeres.bastionbot.org/images/pokemon/1.png
@@ -8,25 +9,62 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 
 function Home() {
-  const [data, setData] = useState([]);
-  const [types, setType] = useState([]);
+  const [data, setData] = useState({ data: [], types: [] });
+  // const [data, setData] = useState([]);
+  // const [types, setType] = useState([]);
+  // setState(prevState => {
+  //   return {...prevState, ...updatedValues};
+  // });
 
+  //   setStyle(prevStyle => ({
+  //     ...prevStyle,
+  //     font: { ...prevStyle.font, align: event.target.value }
+  // }));
+
+  //   const styles = {
+  //     font: {
+  //         size: {
+  //             value: '22',
+  //             unit: 'px'
+  //         },
+  //         weight: 'bold',
+  //         color: '#663300',
+  //         family: 'arial',
+  //         align: 'center'
+  //     }
+  // };
   useEffect(async () => {
     console.log("useEffect run");
     const res = await fetch("https://pokeapi.co/api/v2/pokemon");
     const pokemons = await res.json();
     const { results } = pokemons;
-    setData(results);
-    console.log(data, "data");
+    setData({
+      types: [],
+      data: results,
+    });
     results.forEach((pokemon) => {
-      console.log("url", pokemon.url);
       fetch(pokemon.url)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data.types);
-          setType(data.types);
+          setData((prevData) => {
+            return {
+              ...prevData,
+              types: [...prevData.types, data.types],
+            };
+          });
         });
     });
+    // setData(results);
+    // console.log(data, "data");
+    // results.forEach((pokemon) => {
+    //   console.log("url", pokemon.url);
+    //   fetch(pokemon.url)
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       console.log(data.types);
+    //       setType(data.types);
+    //     });
+    // });
   }, []);
 
   return (
@@ -36,10 +74,9 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {data.map((pokiemon, idx) => (
+            {console.log(data, "data")}
+            {/* {data.map((pokiemon, idx) => (
               <li key={idx} className="card">
-                {/* <Link href={`/pokemon/${idx + 1}`}>
-                  <a> */}
                 <img
                   src={`https://pokeres.bastionbot.org/images/pokemon/${
                     idx + 1
@@ -51,10 +88,8 @@ function Home() {
                 <h2>
                   {idx + 1}. {pokiemon.name}
                 </h2>
-                {/* </a>
-                </Link> */}
               </li>
-            ))}
+            ))} */}
           </ul>
         </div>
       </main>
