@@ -3,14 +3,20 @@ import Link from "next/link";
 // -https://pokeapi.co/api/v2/pokemon
 // -https://pokeres.bastionbot.org/images/pokemon/1.png
 
-// I want to display a list of Pokemon
-// Every Pokemon will be in a card
-// Every Pokemon card will have the name, picture, their number, and their type
-// For styling, only use styled-jsx that came with nextjs
+//display a list of pokemon cards in one page (index page). not every pokemon on its page. useEffect to fetch the data.
+import React, { useState, useEffect } from "react";
 
-function Home({ pokemons }) {
-  console.log(pokemons);
-  const { results } = pokemons;
+function Home() {
+  const [data, setData] = useState([]);
+
+  useEffect(async () => {
+    console.log("useEffect run");
+    const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+    const pokemons = await res.json();
+    const { results } = pokemons;
+    return setData(results);
+  }, []);
+
   return (
     <div className="container">
       <main>
@@ -18,7 +24,7 @@ function Home({ pokemons }) {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {results.map((pokiemon, idx) => (
+            {data.map((pokiemon, idx) => (
               <li key={idx} className="card">
                 <Link href={`/pokemon/${idx + 1}`}>
                   <a>
@@ -187,14 +193,14 @@ function Home({ pokemons }) {
   );
 }
 
-export async function getStaticProps() {
-  const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-  const pokemons = await res.json();
-  return {
-    props: {
-      pokemons,
-    },
-  };
-}
+// export async function getStaticProps() {
+//   const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+//   const pokemons = await res.json();
+//   return {
+//     props: {
+//       pokemons,
+//     },
+//   };
+// }
 
 export default Home;
