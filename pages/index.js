@@ -9,62 +9,21 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
 function Home() {
-  const [data, setData] = useState({ data: [], types: [] });
-  // const [data, setData] = useState([]);
-  // const [types, setType] = useState([]);
-  // setState(prevState => {
-  //   return {...prevState, ...updatedValues};
-  // });
-
-  //   setStyle(prevStyle => ({
-  //     ...prevStyle,
-  //     font: { ...prevStyle.font, align: event.target.value }
-  // }));
-
-  //   const styles = {
-  //     font: {
-  //         size: {
-  //             value: '22',
-  //             unit: 'px'
-  //         },
-  //         weight: 'bold',
-  //         color: '#663300',
-  //         family: 'arial',
-  //         align: 'center'
-  //     }
-  // };
+  const [data, setData] = useState([]);
+  const [types, setTypes] = useState([]);
   useEffect(async () => {
-    console.log("useEffect run");
     const res = await fetch("https://pokeapi.co/api/v2/pokemon");
     const pokemons = await res.json();
     const { results } = pokemons;
-    setData({
-      types: [],
-      data: results,
-    });
+    setData(results);
     results.forEach((pokemon) => {
       fetch(pokemon.url)
         .then((response) => response.json())
-        .then((data) => {
-          setData((prevData) => {
-            return {
-              ...prevData,
-              types: [...prevData.types, data.types],
-            };
-          });
+        .then((types) => {
+          setTypes(types.types);
         });
     });
-    // setData(results);
-    // console.log(data, "data");
-    // results.forEach((pokemon) => {
-    //   console.log("url", pokemon.url);
-    //   fetch(pokemon.url)
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       console.log(data.types);
-    //       setType(data.types);
-    //     });
-    // });
+    return { data, types };
   }, []);
 
   return (
@@ -74,8 +33,7 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {console.log(data, "data")}
-            {/* {data.map((pokiemon, idx) => (
+            {data.map((pokiemon, idx) => (
               <li key={idx} className="card">
                 <img
                   src={`https://pokeres.bastionbot.org/images/pokemon/${
@@ -88,8 +46,9 @@ function Home() {
                 <h2>
                   {idx + 1}. {pokiemon.name}
                 </h2>
+                <h3>{types[idx + 1] ? types[idx + 1][0]["type"] : null}</h3>
               </li>
-            ))} */}
+            ))}
           </ul>
         </div>
       </main>
