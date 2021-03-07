@@ -4,17 +4,29 @@ import Link from "next/link";
 // -https://pokeres.bastionbot.org/images/pokemon/1.png
 
 //display a list of pokemon cards in one page (index page). not every pokemon on its page. useEffect to fetch the data.
+//card has name number type image
 import React, { useState, useEffect } from "react";
 
 function Home() {
   const [data, setData] = useState([]);
+  const [types, setType] = useState([]);
 
   useEffect(async () => {
     console.log("useEffect run");
     const res = await fetch("https://pokeapi.co/api/v2/pokemon");
     const pokemons = await res.json();
     const { results } = pokemons;
-    return setData(results);
+    setData(results);
+    console.log(data, "data");
+    results.forEach((pokemon) => {
+      console.log("url", pokemon.url);
+      fetch(pokemon.url)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.types);
+          setType(data.types);
+        });
+    });
   }, []);
 
   return (
@@ -26,13 +38,21 @@ function Home() {
           <ul className="no-bullets grid">
             {data.map((pokiemon, idx) => (
               <li key={idx} className="card">
-                <Link href={`/pokemon/${idx + 1}`}>
-                  <a>
-                    <h3>
-                      {idx + 1}. {pokiemon.name}
-                    </h3>
-                  </a>
-                </Link>
+                {/* <Link href={`/pokemon/${idx + 1}`}>
+                  <a> */}
+                <img
+                  src={`https://pokeres.bastionbot.org/images/pokemon/${
+                    idx + 1
+                  }.png`}
+                  alt={pokiemon.name}
+                  width="200"
+                  height="200"
+                />
+                <h2>
+                  {idx + 1}. {pokiemon.name}
+                </h2>
+                {/* </a>
+                </Link> */}
               </li>
             ))}
           </ul>
