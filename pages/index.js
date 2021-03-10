@@ -34,9 +34,9 @@ function Home() {
 
     const callback = (res) => {
       let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-      console.log(res, "cb");
+      // console.log(res, "cb");
       for (const [index, value] of res.entries()) {
-        console.log(index, value);
+        // console.log(index, value);
         async function getFollowUp() {
           const res = await fetch(value.url);
           const pokemon = await res.json().then((data) => {
@@ -51,10 +51,13 @@ function Home() {
         }
         getFollowUp();
         const secondCallback = (data) => {
-          setPokemonData((prevState) => ({
-            ...prevState,
-            data,
-          }));
+          console.log(data, "data in second callback");
+          setPokemonData((oldArray) => [...oldArray, data]);
+
+          // setPokemonData((prevState) => ({
+          //   ...prevState,
+          //   data,
+          // }));
         };
       }
     };
