@@ -21,33 +21,44 @@ import Image from "next/image";
 
 import React, { useState, useEffect } from "react";
 
+function waiting(ms) {
+  return new Promise((resolve) => setTimeout(() => resolve(), ms));
+}
+
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
+  const [isFetching, setIsFetching] = useState(true);
   useEffect(() => {
+    setIsFetching(true);
     async function getData() {
-      const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
       const pokemonsArray = [];
 
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const { results: pokemons } = await res.json();
+      try {
+        const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+        const { results: pokemons } = await res.json();
 
-      for (const pokemon of pokemons) {
-        const res = await fetch(pokemon.url);
-        const { id, name, types } = await res.json();
-        pokemonsArray.push({
-          id,
-          name,
-          image_url: imgUrl + id + ".png",
-          types,
-        });
+        for (const pokemon of pokemons) {
+          const res = await fetch(pokemon.url);
+          const { id, name, types } = await res.json();
+          pokemonsArray.push({
+            id,
+            name,
+            image_url: `https://pokeres.bastionbot.org/images/pokemon/${id}.png`,
+            types,
+          });
+        }
+        await waiting(500);
+        setPokemonData(pokemonsArray);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsFetching(false);
       }
-
-      setPokemonData(pokemonsArray);
     }
     getData();
   }, []);
 
-  // if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
+  //  if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
 
   return (
     <div className="container">
@@ -55,24 +66,32 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <ul className="no-bullets grid">
-            {console.log(pokemonData)}
-            {pokemonData.map((x) => (
-              <li key={x.number} className="card">
-                <img src={x.image_url} alt={x.name} width="200" height="200" />
-                <h2>
-                  #{x.id}
-                  <br />
-                  {x.name}
-                </h2>
-                <ul>
-                  {x.types.map(({ slot, type }) => (
-                    <li key={slot}>{type.name}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+          {isFetching ? (
+            <div>Loading....</div>
+          ) : (
+            <ul className="no-bullets grid">
+              {pokemonData.map((pokemon) => (
+                <li key={pokemon.id} className="card">
+                  <img
+                    src={pokemon.image_url}
+                    alt={pokemon.name}
+                    width="200"
+                    height="200"
+                  />
+                  <h2>
+                    #{pokemon.id}
+                    <br />
+                    {pokemon.name}
+                  </h2>
+                  <ul>
+                    {pokemon.types.map(({ slot, type }) => (
+                      <li key={slot}>{type.name}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </main>
 
