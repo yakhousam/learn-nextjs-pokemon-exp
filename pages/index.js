@@ -25,41 +25,29 @@ function Home() {
   const [pokemonData, setPokemonData] = useState([]);
   useEffect(() => {
     async function getData() {
+      const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
+      const pokemonsArray = [];
+
       const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const pokemons = await res.json();
-      const { results } = pokemons;
-      return callback(results);
+      const { results: pokemons } = await res.json();
+
+      for (const pokemon of pokemons) {
+        const res = await fetch(pokemon.url);
+        const { id, name, types } = await res.json();
+        pokemonsArray.push({
+          id,
+          name,
+          image_url: imgUrl + id + ".png",
+          types,
+        });
+      }
+
+      setPokemonData(pokemonsArray);
     }
     getData();
-
-    const callback = (res) => {
-      let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-      for (const [index, value] of res.entries()) {
-        const number = index + 1;
-        async function getFollowUp() {
-          const res = await fetch(value.url);
-          const pokemon = await res.json().then((data) => {
-            return {
-              types: [data.types],
-              name: data.name,
-              image_url: imgUrl + number + ".png",
-              number,
-            };
-          });
-          secondCallback(pokemon);
-        }
-        getFollowUp();
-        const secondCallback = (data) => {
-          setPokemonData((oldArray) => [...oldArray, data]);
-
-          // setPokemonData((prevState) => ({
-          //   ...prevState,
-          //   data,
-          // }));
-        };
-      }
-    };
   }, []);
+
+  // if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
 
   return (
     <div className="container">
@@ -73,14 +61,15 @@ function Home() {
               <li key={x.number} className="card">
                 <img src={x.image_url} alt={x.name} width="200" height="200" />
                 <h2>
-                  {x.number}. {x.name}
+                  #{x.id}
+                  <br />
+                  {x.name}
                 </h2>
-                <p></p>
-                {console.log(x.type)}
-                {/* 
-                {x.types.forEach((element) => {
-                  element.forEach((nametype) => <p>nametype.type.name</p>);
-                })} */}
+                <ul>
+                  {x.types.map(({ slot, type }) => (
+                    <li key={slot}>{type.name}</li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
