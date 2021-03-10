@@ -1,5 +1,5 @@
-import Link from "next/link";
-import Image from "next/image";
+// import Link from "next/link";
+// import Image from "next/image";
 // import styles from "./index.module.css";
 // these are the endpoints we will use
 // -https://pokeapi.co/api/v2/pokemon
@@ -19,21 +19,18 @@ import Image from "next/image";
 // ......
 // ]
 
-import React, { useState, useEffect } from "react";
+// I used id rather than number
 
-function waiting(ms) {
-  return new Promise((resolve) => setTimeout(() => resolve(), ms));
-}
+import React, { useState, useEffect } from "react";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
-  useEffect(() => {
-    setIsFetching(true);
-    async function getData() {
-      const pokemonsArray = [];
 
+  useEffect(() => {
+    async function getData() {
       try {
+        const pokemonsArray = [];
         const res = await fetch("https://pokeapi.co/api/v2/pokemon");
         const { results: pokemons } = await res.json();
 
@@ -47,16 +44,19 @@ function Home() {
             types,
           });
         }
-        await waiting(500);
         setPokemonData(pokemonsArray);
       } catch (error) {
         console.error(error);
+        // rather than consoling the error we could have an error state and
+        // set it to true here and use it to display an error for the user; for example in a toast
       } finally {
         setIsFetching(false);
       }
     }
     getData();
   }, []);
+
+  // the code bellow is what I use to display the data in the browser rather than using console.log
 
   //  if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
 
@@ -65,7 +65,7 @@ function Home() {
       <main className="main">
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
-        <div className="">
+        <div>
           {isFetching ? (
             <div>Loading....</div>
           ) : (
