@@ -34,24 +34,22 @@ function Home() {
 
     const callback = (res) => {
       let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-      // console.log(res, "cb");
       for (const [index, value] of res.entries()) {
-        // console.log(index, value);
+        const number = index + 1;
         async function getFollowUp() {
           const res = await fetch(value.url);
           const pokemon = await res.json().then((data) => {
             return {
               types: [data.types],
               name: data.name,
-              image_url: imgUrl + index + 1,
-              number: index + 1,
+              image_url: imgUrl + number + ".png",
+              number,
             };
           });
           secondCallback(pokemon);
         }
         getFollowUp();
         const secondCallback = (data) => {
-          console.log(data, "data in second callback");
           setPokemonData((oldArray) => [...oldArray, data]);
 
           // setPokemonData((prevState) => ({
@@ -70,19 +68,21 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {console.log(pokemonData, "da")}
-            {/* {pokemonData.map((x) => (
+            {console.log(pokemonData)}
+            {pokemonData.map((x) => (
               <li key={x.number} className="card">
                 <img src={x.image_url} alt={x.name} width="200" height="200" />
-                <h2>{x.name}</h2>
-                <p>
-                  {" "}
-                  {pokiemon.types.forEach((element) => {
-                    return element.type.name;
-                  })}
-                </p>
+                <h2>
+                  {x.number}. {x.name}
+                </h2>
+                <p></p>
+                {console.log(x.type)}
+                {/* 
+                {x.types.forEach((element) => {
+                  element.forEach((nametype) => <p>nametype.type.name</p>);
+                })} */}
               </li>
-            ))} */}
+            ))}
           </ul>
         </div>
       </main>
