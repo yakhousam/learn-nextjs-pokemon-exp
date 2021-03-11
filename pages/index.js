@@ -1,6 +1,3 @@
-import Link from "next/link";
-import Image from "next/image";
-// import styles from "./index.module.css";
 // these are the endpoints we will use
 // -https://pokeapi.co/api/v2/pokemon
 // -https://pokeres.bastionbot.org/images/pokemon/1.png
