@@ -34,16 +34,17 @@ function Home() {
 
     const callback = (res) => {
       let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-      for (const [index, value] of res.entries()) {
-        const number = index + 1;
+      for (const value of res) {
+        // const number = index + 1;
         async function getFollowUp() {
           const res = await fetch(value.url);
           const pokemon = await res.json().then((data) => {
+            console.log(data)
             return {
               types: data.types,
               name: data.name,
-              image_url: imgUrl + number + ".png",
-              number,
+              image_url: imgUrl + data.id + ".png",
+              number: data.id,
             };
           });
           secondCallback(pokemon);
@@ -80,10 +81,6 @@ function Home() {
                     <li key={idx}>{x.type.name}</li>
                   ))}
                 </ul>
-
-                {/* {x.types.forEach((element) => {
-                  element.forEach((nametype) => <p>nametype.type.name</p>);
-                })} */}
               </li>
             ))}
           </ul>
