@@ -26,19 +26,23 @@ import React, { useState, useEffect } from "react";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
+  const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
+  const holder=[]
   useEffect(() => {
     async function getData() {
       const res = await fetch("https://pokeapi.co/api/v2/pokemon");
       const pokemons = await res.json();
       const { results } = pokemons;
-      return callback(results);
+      for (const value of results) {
+        await getFollowUp(imgUrl, value);
+     }
+     setPokemonData(holder)
     }
     getData();
 
-    const getFollowUp = async (imgUrl, value, secondCallback) => {
+    const getFollowUp = async (imgUrl, value) => {
       const res = await fetch(value.url);
       const pokemon = await res.json().then((data) => {
-        // console.log(data);
         return {
           types: data.types,
           name: data.name,
@@ -46,18 +50,7 @@ function Home() {
           number: data.id,
         };
       });
-      secondCallback(pokemon);
-    };
-
-    const secondCallback = async (data) => {
-      setPokemonData((oldArray) => [...oldArray, data]);
-    };
-
-    const callback = (res) => {
-      let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-      for (const value of res) {
-        getFollowUp(imgUrl, value, secondCallback);
-      }
+      holder.push(pokemon);
     };
   }, []);
 
@@ -68,7 +61,6 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {/* {console.log(pokemonData)} */}
             {pokemonData.map((x) => (
               <li key={x.number} className="card">
                 <img src={x.image_url} alt={x.name} width="200" height="200" />
