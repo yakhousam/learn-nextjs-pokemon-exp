@@ -19,6 +19,9 @@ import Image from "next/image";
 // ......
 // ]
 
+// putting functions inside a for loop is really unreadable. I guess you did this because of the “asyc” keyword that you can’t use in the for loop
+// to fix this you can extract the functions outside the for loop and make the callback function asynchronous then you can use asyc inside the for loop
+
 import React, { useState, useEffect } from "react";
 
 function Home() {
@@ -32,32 +35,28 @@ function Home() {
     }
     getData();
 
+    const getFollowUp = async (imgUrl, value, secondCallback) => {
+      const res = await fetch(value.url);
+      const pokemon = await res.json().then((data) => {
+        // console.log(data);
+        return {
+          types: data.types,
+          name: data.name,
+          image_url: imgUrl + data.id + ".png",
+          number: data.id,
+        };
+      });
+      secondCallback(pokemon);
+    };
+
+    const secondCallback = async (data) => {
+      setPokemonData((oldArray) => [...oldArray, data]);
+    };
+
     const callback = (res) => {
       let imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
       for (const value of res) {
-        // const number = index + 1;
-        async function getFollowUp() {
-          const res = await fetch(value.url);
-          const pokemon = await res.json().then((data) => {
-            console.log(data)
-            return {
-              types: data.types,
-              name: data.name,
-              image_url: imgUrl + data.id + ".png",
-              number: data.id,
-            };
-          });
-          secondCallback(pokemon);
-        }
-        getFollowUp();
-        const secondCallback = (data) => {
-          setPokemonData((oldArray) => [...oldArray, data]);
-
-          // setPokemonData((prevState) => ({
-          //   ...prevState,
-          //   data,
-          // }));
-        };
+        getFollowUp(imgUrl, value, secondCallback);
       }
     };
   }, []);
