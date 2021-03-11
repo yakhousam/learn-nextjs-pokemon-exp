@@ -40,7 +40,7 @@ function Home() {
           const res = await fetch(value.url);
           const pokemon = await res.json().then((data) => {
             return {
-              types: [data.types],
+              types: data.types,
               name: data.name,
               image_url: imgUrl + number + ".png",
               number,
@@ -68,17 +68,20 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {console.log(pokemonData)}
+            {/* {console.log(pokemonData)} */}
             {pokemonData.map((x) => (
               <li key={x.number} className="card">
                 <img src={x.image_url} alt={x.name} width="200" height="200" />
                 <h2>
                   {x.number}. {x.name}
                 </h2>
-                <p></p>
-                {console.log(x.type)}
-                {/* 
-                {x.types.forEach((element) => {
+                <ul>
+                  {x.types.map((x, idx) => (
+                    <li key={idx}>{x.type.name}</li>
+                  ))}
+                </ul>
+
+                {/* {x.types.forEach((element) => {
                   element.forEach((nametype) => <p>nametype.type.name</p>);
                 })} */}
               </li>
