@@ -1,64 +1,43 @@
-// import Link from "next/link";
-// import Image from "next/image";
-// import styles from "./index.module.css";
-// these are the endpoints we will use
-// -https://pokeapi.co/api/v2/pokemon
-// -https://pokeres.bastionbot.org/images/pokemon/1.png
+import useSwr from "swr";
 
-//display a list of pokemon cards in one page (index page). not every pokemon on its page. useEffect to fetch the data.
-//card has name number type image
-// the state should be like this
+async function fetcher(url) {
+  // if you change the tab on your browser and go back you will see this line printed on the console
+  // that means useSwr fetch and revalidate the data
+  console.log("fetcher is fetching");
+  try {
+    const pokemonsArray = [];
+    const res = await fetch(url);
+    const { results: pokemons } = await res.json();
 
-// [
-//  {
-//   name:  ""
-//   image_url: ""
-//   number:""
-//   types: []
-//  },
-// ......
-// ]
-
-// I used id rather than number
-
-import React, { useState, useEffect } from "react";
+    for (const pokemon of pokemons) {
+      const res = await fetch(pokemon.url);
+      const { id, name, types } = await res.json();
+      pokemonsArray.push({
+        id,
+        name,
+        image_url: `https://pokeres.bastionbot.org/images/pokemon/${id}.png`,
+        types,
+      });
+    }
+    return pokemonsArray;
+  } catch (error) {
+    // we rethrow the error so it can be catched by useSwr
+    throw error;
+  }
+}
 
 function Home() {
-  const [pokemonData, setPokemonData] = useState([]);
-  const [isFetching, setIsFetching] = useState(true);
-
-  useEffect(() => {
-    async function getData() {
-      try {
-        const pokemonsArray = [];
-        const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-        const { results: pokemons } = await res.json();
-
-        for (const pokemon of pokemons) {
-          const res = await fetch(pokemon.url);
-          const { id, name, types } = await res.json();
-          pokemonsArray.push({
-            id,
-            name,
-            image_url: `https://pokeres.bastionbot.org/images/pokemon/${id}.png`,
-            types,
-          });
-        }
-        setPokemonData(pokemonsArray);
-      } catch (error) {
-        console.error(error);
-        // rather than consoling the error we could have an error state and
-        // set it to true here and use it to display an error for the user; for example in a toast
-      } finally {
-        setIsFetching(false);
-      }
-    }
-    getData();
-  }, []);
+  const {
+    data: pokemonData,
+    error,
+  } = useSwr("https://pokeapi.co/api/v2/pokemon", (url) => fetcher(url));
 
   // the code bellow is what I use to display the data in the browser rather than using console.log
+  // if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
 
-  //  if (true) return <pre>{JSON.stringify(pokemonData, null, 2)}</pre>;
+  if (error) return <div>something went wrong</div>;
+
+  if (!pokemonData) return <div>Loading.............</div>;
 
   return (
     <div className="container">
@@ -66,7 +45,7 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div>
-          {isFetching ? (
+          {!pokemonData ? (
             <div>Loading....</div>
           ) : (
             <ul className="no-bullets grid">
