@@ -1,24 +1,3 @@
-// these are the endpoints we will use
-// -https://pokeapi.co/api/v2/pokemon
-// -https://pokeres.bastionbot.org/images/pokemon/1.png
-
-//display a list of pokemon cards in one page (index page). not every pokemon on its page. useEffect to fetch the data.
-//card has name number type image
-// the state should be like this
-
-// [
-//  {
-//   name:  ""
-//   image_url: ""
-//   number:""
-//   types: []
-//  },
-// ......
-// ]
-
-// putting functions inside a for loop is really unreadable. I guess you did this because of the “asyc” keyword that you can’t use in the for loop
-// to fix this you can extract the functions outside the for loop and make the callback function asynchronous then you can use asyc inside the for loop
-
 import React, { useState, useEffect } from "react";
 
 function Home() {
@@ -204,15 +183,5 @@ function Home() {
     </div>
   );
 }
-
-// export async function getStaticProps() {
-//   const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-//   const pokemons = await res.json();
-//   return {
-//     props: {
-//       pokemons,
-//     },
-//   };
-// }
 
 export default Home;
