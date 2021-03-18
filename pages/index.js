@@ -23,34 +23,31 @@ import React, { useState, useEffect } from "react";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
-  const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-  const holder=[]
+
   useEffect(() => {
+    const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
+    const holder=[]
     async function getData() {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const pokemons = await res.json();
-      const { results } = pokemons;
-      for (const value of results) {
-        await getFollowUp(imgUrl, value);
-     }
-     setPokemonData(holder)
+      try{
+        const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+        const pokemons = await res.json();
+        const { results } = pokemons;
+        for (const value of results) {
+          const result= await fetch(value.url)
+          const pokemon = await result.json()
+          holder.push({
+            number:pokemon.id,
+            name:pokemon.name,
+            image_url:imgUrl+pokemon.id+".png",
+            types:pokemon.types
+          })
+       }
+       setPokemonData(holder)
+      } catch(err){console.log(err)}
     }
     getData();
-
-    const getFollowUp = async (imgUrl, value) => {
-      const res = await fetch(value.url);
-      const pokemon = await res.json().then((data) => {
-        return {
-          types: data.types,
-          name: data.name,
-          image_url: imgUrl + data.id + ".png",
-          number: data.id,
-        };
-      });
-      holder.push(pokemon);
-    };
   }, []);
-
+  console.log(pokemonData, 'data')
   return (
     <div className="container">
       <main className="main">
@@ -58,15 +55,15 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <ul className="no-bullets grid">
-            {pokemonData.map((x) => (
-              <li key={x.number} className="card">
-                <img src={x.image_url} alt={x.name} width="200" height="200" />
+            {pokemonData.map((pokemon) => (
+              <li key={pokemon.number} className="card">
+                <img src={pokemon.image_url} alt={pokemon.name} width="200" height="200" />
                 <h2>
-                  {x.number}. {x.name}
+                  {pokemon.number}. {pokemon.name}
                 </h2>
                 <ul>
-                  {x.types.map((x, idx) => (
-                    <li key={idx}>{x.type.name}</li>
+                  {pokemon.types.map((pokemon) => (
+                    <li key={pokemon.slot}>{pokemon.type.name}</li>
                   ))}
                 </ul>
               </li>
