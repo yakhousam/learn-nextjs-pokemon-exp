@@ -2,42 +2,70 @@ import React, { useState, useEffect } from "react";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNext] = useState()
-  const [currPage, setCurrPage] =useState("https://pokeapi.co/api/v2/pokemon")
+  const [nextPage, setNext] = useState();
+  const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
+  const [prevPage, setPrev] = useState();
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-    const holder=[]
+    const holder = [];
     async function getData() {
-      try{
+      try {
         const res = await fetch(currPage);
         const pokemons = await res.json();
-        console.log(pokemons, 'pokemons')
+        console.log(pokemons);
+        // console.log(pokemons.next, "pokemons");
+        setPrev(pokemons.previous);
+        setNext(pokemons.next);
         const { results } = pokemons;
         for (const value of results) {
-          const result= await fetch(value.url)
-          const pokemon = await result.json()
+          const result = await fetch(value.url);
+          const pokemon = await result.json();
           holder.push({
-            number:pokemon.id,
-            name:pokemon.name,
-            image_url:imgUrl+pokemon.id+".png",
-            types:pokemon.types
-          })
-       }
-       setPokemonData(holder)
-      } catch(err){console.log(err)}
+            number: pokemon.id,
+            name: pokemon.name,
+            image_url: imgUrl + pokemon.id + ".png",
+            types: pokemon.types,
+          });
+        }
+        setPokemonData(holder);
+      } catch (err) {
+        console.log(err);
+      }
     }
     getData();
-  }, []);
+  }, [currPage]);
+
+  const Next = () => {
+    setCurrPage(nextPage);
+  };
+
+  const Prev = () => {
+    setCurrPage(prevPage);
+  };
+
   return (
     <div className="container">
       <main className="main">
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
+          <div className="grid">
+            <button className="card buttonText" onClick={Prev}>
+              Prev
+            </button>
+            <button className="card buttonText" onClick={Next}>
+              Next
+            </button>
+          </div>
           <ul className="no-bullets grid">
             {pokemonData.map((pokemon) => (
               <li key={pokemon.number} className="card">
-                <img src={pokemon.image_url} alt={pokemon.name} width="200" height="200" />
+                <img
+                  src={pokemon.image_url}
+                  alt={pokemon.name}
+                  width="200"
+                  height="200"
+                />
                 <h2>
                   {pokemon.number}. {pokemon.name}
                 </h2>
@@ -53,6 +81,11 @@ function Home() {
       </main>
 
       <style jsx>{`
+        .buttonText {
+          font-size: 1.5em;
+          font-weight: bold;
+          text-align: center !important;
+        }
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
