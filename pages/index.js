@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState([]);
-
+  const [nextPage, setNext] = useState()
+  const [currPage, setCurrPage] =useState("https://pokeapi.co/api/v2/pokemon")
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder=[]
     async function getData() {
       try{
-        const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+        const res = await fetch(currPage);
         const pokemons = await res.json();
+        console.log(pokemons, 'pokemons')
         const { results } = pokemons;
         for (const value of results) {
           const result= await fetch(value.url)
@@ -26,7 +28,6 @@ function Home() {
     }
     getData();
   }, []);
-  console.log(pokemonData, 'data')
   return (
     <div className="container">
       <main className="main">
