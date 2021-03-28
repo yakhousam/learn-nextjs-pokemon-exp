@@ -3,25 +3,36 @@ import { useRouter } from 'next/router'
 
 function Home() {
   const router = useRouter()
-
+  const initialPage="https://pokeapi.co/api/v2/pokemon"
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNext] = useState();
-  const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
+  const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
-  const [pageNumber, setPageNumber]=useState(1)
+  // const [pageNumber, setPageNumber]=useState(1)
 
+  useEffect(() => {
+    let page=Number(router.query.page)
+    console.log(page, 'page')
+    if(page&&page!==0){
+      console.log('page was changed')
+      let queryPage=page*20
+      console.log(`${initialPage}?offset=${queryPage}&limit=20`, 'querypage to change to')
+      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`)
+    }
+
+  }, [router.query])
+  
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData() {
       try {
+        console.log(router.query, 'router query params')
+        console.log(currPage, 'currPage')
         const res = await fetch(currPage);
         const pokemons = await res.json();
-        // console.log(pokemons);
-        // console.log(pokemons.next, "pokemons");
         setPrev(pokemons.previous);
         setNext(pokemons.next);
-        // console.log(currPage,"currpage")
         const parsedUrl = new URL(currPage);
         const offset= Number(parsedUrl.searchParams.get("offset"))/20;
         router.push(`/?page=${offset}`, undefined, { shallow: true })
@@ -44,10 +55,6 @@ function Home() {
     }
     getData();
   }, [currPage]);
-
-  useEffect(() => {
-    // The counter changed!
-  }, [router.query.counter])
 
   const Next = () => {
     setCurrPage(nextPage);
