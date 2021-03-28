@@ -1,41 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function Home() {
-  const router = useRouter()
-  const initialPage="https://pokeapi.co/api/v2/pokemon"
+  const router = useRouter();
+  const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNext] = useState();
   const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
-  // const [pageNumber, setPageNumber]=useState(1)
+  const [isLoading, SetIsLoading] = useState(true);
 
   useEffect(() => {
-    let page=Number(router.query.page)
-    console.log(page, 'page')
-    if(page&&page!==0){
-      console.log('page was changed')
-      let queryPage=page*20
-      console.log(`${initialPage}?offset=${queryPage}&limit=20`, 'querypage to change to')
-      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`)
+    SetIsLoading(true);
+    let page = Number(router.query.page);
+    console.log(page, "page");
+    if (page && page !== 0) {
+      console.log("page was changed");
+      let queryPage = page * 20;
+      console.log(
+        `${initialPage}?offset=${queryPage}&limit=20`,
+        "querypage to change to"
+      );
+      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
     }
+  }, [router.query]);
 
-  }, [router.query])
-  
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData() {
       try {
-        console.log(router.query, 'router query params')
-        console.log(currPage, 'currPage')
+        console.log(router.query, "router query params");
+        console.log(currPage, "currPage");
         const res = await fetch(currPage);
         const pokemons = await res.json();
         setPrev(pokemons.previous);
         setNext(pokemons.next);
         const parsedUrl = new URL(currPage);
-        const offset= Number(parsedUrl.searchParams.get("offset"))/20;
-        router.push(`/?page=${offset}`, undefined, { shallow: true })
+        const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+        router.push(`/?page=${offset}`, undefined, { shallow: true });
 
         const { results } = pokemons;
         for (const value of results) {
@@ -49,6 +52,7 @@ function Home() {
           });
         }
         setPokemonData(holder);
+        SetIsLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -64,6 +68,7 @@ function Home() {
     setCurrPage(prevPage);
   };
 
+  if (isLoading) return "Loading the pokemons";
   return (
     <div className="container">
       <main className="main">
@@ -71,9 +76,11 @@ function Home() {
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
           <div className="grid">
-            <button className="card buttonText" onClick={Prev}>
-              Prev
-            </button>
+            {prevPage && (
+              <button className="card buttonText" onClick={Prev}>
+                Prev
+              </button>
+            )}
             <button className="card buttonText" onClick={Next}>
               Next
             </button>
