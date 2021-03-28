@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-
+import PokemonUL from "../components/PokemonUL";
+import NextPrevPagination from "../components/NextPrevPagination";
 function Home() {
   const router = useRouter();
   const initialPage = "https://pokeapi.co/api/v2/pokemon";
@@ -75,40 +76,22 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <div className="grid">
-            {prevPage && (
-              <button className="card buttonText" onClick={Prev}>
-                Prev
-              </button>
-            )}
-            <button className="card buttonText" onClick={Next}>
-              Next
-            </button>
-          </div>
-          <ul className="no-bullets grid">
-            {pokemonData.map((pokemon) => (
-              <li key={pokemon.number} className="card">
-                <img
-                  src={pokemon.image_url}
-                  alt={pokemon.name}
-                  width="200"
-                  height="200"
-                />
-                <h2>
-                  {pokemon.number}. {pokemon.name}
-                </h2>
-                <ul>
-                  {pokemon.types.map((pokemon) => (
-                    <li key={pokemon.slot}>{pokemon.type.name}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+          <NextPrevPagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <PokemonUL pokemonData={pokemonData} />
         </div>
       </main>
-
-      <style jsx>{`
+      <style jsx global>{`
+        html,
+        body {
+          padding: 0;
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+            sans-serif;
+        }
+        * {
+          box-sizing: border-box;
+        }
         .buttonText {
           font-size: 1.5em;
           font-weight: bold;
@@ -229,19 +212,7 @@ function Home() {
           margin: 0; /* Remove margins */
         }
       `}</style>
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      <style jsx>{``}</style>
     </div>
   );
 }
