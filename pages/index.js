@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/router'
 
 function Home() {
+  const router = useRouter()
+
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNext] = useState();
   const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
   const [prevPage, setPrev] = useState();
+  const [pageNumber, setPageNumber]=useState(1)
+
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
@@ -12,10 +17,15 @@ function Home() {
       try {
         const res = await fetch(currPage);
         const pokemons = await res.json();
-        console.log(pokemons);
+        // console.log(pokemons);
         // console.log(pokemons.next, "pokemons");
         setPrev(pokemons.previous);
         setNext(pokemons.next);
+        // console.log(currPage,"currpage")
+        const parsedUrl = new URL(currPage);
+        const offset= Number(parsedUrl.searchParams.get("offset"))/20;
+        router.push(`/?page=${offset}`, undefined, { shallow: true })
+
         const { results } = pokemons;
         for (const value of results) {
           const result = await fetch(value.url);
@@ -34,6 +44,10 @@ function Home() {
     }
     getData();
   }, [currPage]);
+
+  useEffect(() => {
+    // The counter changed!
+  }, [router.query.counter])
 
   const Next = () => {
     setCurrPage(nextPage);
