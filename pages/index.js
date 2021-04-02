@@ -1,21 +1,46 @@
 import React, { useState, useEffect } from "react";
-
+import { useRouter } from "next/router";
+import PokemonList from "../components/PokemonList";
+import Pagination from "../components/Pagination";
 function Home() {
+  const router = useRouter();
+  const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNext] = useState();
-  const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
+  const [nextPage, setNextPage] = useState();
+  const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    let page = Number(router.query.page);
+    console.log("page= ", page);
+    if (page && page !== 0) {
+      console.log("page was changed");
+      let queryPage = page * 20;
+      console.log(
+        `${initialPage}?offset=${queryPage}&limit=20`,
+        "querypage to change to"
+      );
+      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
+    }
+  }, [router.query]);
+
   useEffect(() => {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData() {
       try {
+        console.log(router.query, "router query params");
+        console.log(currPage, "currPage");
         const res = await fetch(currPage);
         const pokemons = await res.json();
-        console.log(pokemons);
-        // console.log(pokemons.next, "pokemons");
         setPrev(pokemons.previous);
-        setNext(pokemons.next);
+        setNextPage(pokemons.next);
+        const parsedUrl = new URL(currPage);
+        const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+        router.push(`/?page=${offset}`, undefined, { shallow: true });
+
         const { results } = pokemons;
         for (const value of results) {
           const result = await fetch(value.url);
@@ -28,6 +53,7 @@ function Home() {
           });
         }
         setPokemonData(holder);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -43,44 +69,29 @@ function Home() {
     setCurrPage(prevPage);
   };
 
+  if (isLoading) return "Loading the pokemons";
   return (
     <div className="container">
       <main className="main">
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <div className="grid">
-            <button className="card buttonText" onClick={Prev}>
-              Prev
-            </button>
-            <button className="card buttonText" onClick={Next}>
-              Next
-            </button>
-          </div>
-          <ul className="no-bullets grid">
-            {pokemonData.map((pokemon) => (
-              <li key={pokemon.number} className="card">
-                <img
-                  src={pokemon.image_url}
-                  alt={pokemon.name}
-                  width="200"
-                  height="200"
-                />
-                <h2>
-                  {pokemon.number}. {pokemon.name}
-                </h2>
-                <ul>
-                  {pokemon.types.map((pokemon) => (
-                    <li key={pokemon.slot}>{pokemon.type.name}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+          <Pagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <PokemonList pokemonData={pokemonData} />
         </div>
       </main>
-
-      <style jsx>{`
+      <style jsx global>{`
+        html,
+        body {
+          padding: 0;
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+            sans-serif;
+        }
+        * {
+          box-sizing: border-box;
+        }
         .buttonText {
           font-size: 1.5em;
           font-weight: bold;
@@ -201,19 +212,7 @@ function Home() {
           margin: 0; /* Remove margins */
         }
       `}</style>
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      <style jsx>{``}</style>
     </div>
   );
 }
