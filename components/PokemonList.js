@@ -1,4 +1,4 @@
-function PokemonUL({ pokemonData }) {
+function PokemonList({ pokemonData }) {
   return (
     <>
       <ul className="no-bullets grid">
@@ -24,4 +24,4 @@ function PokemonUL({ pokemonData }) {
     </>
   );
 }
-export default PokemonUL;
+export default PokemonList;

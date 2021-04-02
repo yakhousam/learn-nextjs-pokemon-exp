@@ -1,4 +1,4 @@
-function NextPrevPagination({ prevPage, Prev, Next }) {
+function Pagination({ prevPage, Prev, Next }) {
   return (
     <div className="grid">
       {prevPage && (
@@ -12,4 +12,4 @@ function NextPrevPagination({ prevPage, Prev, Next }) {
     </div>
   );
 }
-export default NextPrevPagination;
+export default Pagination;

@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import PokemonUL from "../components/PokemonUL";
-import NextPrevPagination from "../components/NextPrevPagination";
+import PokemonList from "../components/PokemonList";
+import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
   const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNext] = useState();
+  const [nextPage, setNextPage] = useState();
   const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
-  const [isLoading, SetIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    SetIsLoading(true);
+    setIsLoading(true);
     let page = Number(router.query.page);
-    console.log(page, "page");
+    console.log("page= ", page);
     if (page && page !== 0) {
       console.log("page was changed");
       let queryPage = page * 20;
@@ -36,7 +36,7 @@ function Home() {
         const res = await fetch(currPage);
         const pokemons = await res.json();
         setPrev(pokemons.previous);
-        setNext(pokemons.next);
+        setNextPage(pokemons.next);
         const parsedUrl = new URL(currPage);
         const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
         router.push(`/?page=${offset}`, undefined, { shallow: true });
@@ -53,7 +53,7 @@ function Home() {
           });
         }
         setPokemonData(holder);
-        SetIsLoading(false);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -76,8 +76,8 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <NextPrevPagination Next={Next} Prev={Prev} prevPage={prevPage} />
-          <PokemonUL pokemonData={pokemonData} />
+          <Pagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <PokemonList pokemonData={pokemonData} />
         </div>
       </main>
       <style jsx global>{`
