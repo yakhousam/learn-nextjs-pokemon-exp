@@ -10,37 +10,25 @@ function Home() {
   const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  let page = Number(router.query.page);
+  let queryPage = page * 20;
 
   useEffect(() => {
-    setIsLoading(true);
-    let page = Number(router.query.page);
-    console.log("page= ", page);
-    if (page && page !== 0) {
-      console.log("page was changed");
-      let queryPage = page * 20;
-      console.log(
-        `${initialPage}?offset=${queryPage}&limit=20`,
-        "querypage to change to"
-      );
-      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
-    }
-  }, [router.query]);
+    console.log('top level useEffect run page=', page)
+  }, [page]);
+
 
   useEffect(() => {
+    setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData() {
       try {
-        console.log(router.query, "router query params");
-        console.log(currPage, "currPage");
+        console.log("useEffect run with currPage=",currPage);
         const res = await fetch(currPage);
         const pokemons = await res.json();
         setPrev(pokemons.previous);
         setNextPage(pokemons.next);
-        const parsedUrl = new URL(currPage);
-        const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-        router.push(`/?page=${offset}`, undefined, { shallow: true });
-
         const { results } = pokemons;
         for (const value of results) {
           const result = await fetch(value.url);
@@ -55,13 +43,17 @@ function Home() {
         setPokemonData(holder);
         setIsLoading(false);
       } catch (err) {
-        console.log(err);
+        console.log('err',err);
       }
     }
     getData();
   }, [currPage]);
 
   const Next = () => {
+    const parsedUrl = new URL(currPage);
+    const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+    setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
+    router.push(`/?page=${offset}`, undefined, { shallow: true });
     setCurrPage(nextPage);
   };
 
