@@ -4,19 +4,24 @@ import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
-  const initialPage = "https://pokeapi.co/api/v2/pokemon";
+  // const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNextPage] = useState();
-  const [currPage, setCurrPage] = useState(initialPage);
+  const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
   const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  // let page = Number(router.query.page);
   // console.log('*****router query*****', router.query)
+  let page = Number(router.query.page);
 
 
-  // useEffect(() => {
-  //   console.log('*****top level useEffect run page*****', page)
-  // }, [page]);
+  useEffect(() => {
+    console.log('*****top level useEffect run page*****', page)
+    if(page&&page!==0){
+      const thePage=page*20
+      setCurrPage(`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`);
+      console.log('page is not eual to zero and ezists')
+    }
+  }, [page]);
 
 
   useEffect(() => {
@@ -48,7 +53,7 @@ function Home() {
       }
     }
     getData();
-  }, [currPage]);
+  }, [currPage, page]);
 
   const Next = () => {
     const parsedUrl = new URL(nextPage);
