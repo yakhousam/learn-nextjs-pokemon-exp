@@ -2,44 +2,32 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
+
 function Home() {
-  const router = useRouter();
-  const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNextPage] = useState();
-  const [currPage, setCurrPage] = useState(initialPage);
-  const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const url = router.asPath;
+  const page = url === "/" ? 0 : router.query.page;
+
+  // I get page == undefined the first time even if page query is providen
+  // it causes double fetching
+  // this is why I'm using url variable
+  // will check this later why this happen
 
   useEffect(() => {
-    setIsLoading(true);
-    let page = Number(router.query.page);
-    console.log("page= ", page);
-    if (page && page !== 0) {
-      console.log("page was changed");
-      let queryPage = page * 20;
-      console.log(
-        `${initialPage}?offset=${queryPage}&limit=20`,
-        "querypage to change to"
-      );
-      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
+    if (page === undefined) {
+      setIsLoading(false);
+      return;
     }
-  }, [router.query]);
 
-  useEffect(() => {
-    const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
+    setIsLoading(true);
     const holder = [];
     async function getData() {
       try {
-        console.log(router.query, "router query params");
-        console.log(currPage, "currPage");
-        const res = await fetch(currPage);
+        const query = `?offset=${+page * 20}&limit=20`;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
         const pokemons = await res.json();
-        setPrev(pokemons.previous);
-        setNextPage(pokemons.next);
-        const parsedUrl = new URL(currPage);
-        const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-        router.push(`/?page=${offset}`, undefined, { shallow: true });
 
         const { results } = pokemons;
         for (const value of results) {
@@ -48,35 +36,33 @@ function Home() {
           holder.push({
             number: pokemon.id,
             name: pokemon.name,
-            image_url: imgUrl + pokemon.id + ".png",
+            image_url:
+              "https://pokeres.bastionbot.org/images/pokemon/" +
+              pokemon.id +
+              ".png",
             types: pokemon.types,
           });
         }
-        setPokemonData(holder);
-        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
+      setPokemonData(holder);
+      setIsLoading(false);
     }
     getData();
-  }, [currPage]);
+  }, [page]);
 
-  const Next = () => {
-    setCurrPage(nextPage);
-  };
-
-  const Prev = () => {
-    setCurrPage(prevPage);
-  };
-
+  // it will be better if we show a spinner under the buttons next and prev rather then 
+  // removing the container
   if (isLoading) return "Loading the pokemons";
+
   return (
     <div className="container">
       <main className="main">
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <Pagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <Pagination />
           <PokemonList pokemonData={pokemonData} />
         </div>
       </main>
