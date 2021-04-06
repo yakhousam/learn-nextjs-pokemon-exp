@@ -10,12 +10,13 @@ function Home() {
   const [currPage, setCurrPage] = useState(initialPage);
   const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  let page = Number(router.query.page);
-  let queryPage = page * 20;
+  // let page = Number(router.query.page);
+  // console.log('*****router query*****', router.query)
 
-  useEffect(() => {
-    console.log('top level useEffect run page=', page)
-  }, [page]);
+
+  // useEffect(() => {
+  //   console.log('*****top level useEffect run page*****', page)
+  // }, [page]);
 
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function Home() {
     const holder = [];
     async function getData() {
       try {
-        console.log("useEffect run with currPage=",currPage);
+        console.log("*****useEffect run with currPage******",currPage);
         const res = await fetch(currPage);
         const pokemons = await res.json();
         setPrev(pokemons.previous);
@@ -50,9 +51,18 @@ function Home() {
   }, [currPage]);
 
   const Next = () => {
-    const parsedUrl = new URL(currPage);
+    // let page = Number(router.query.page);
+
+    const parsedUrl = new URL(nextPage);
+    console.log("parsedUrl=",parsedUrl)
+    // if(page===0||page==="0"||!page){
+    //   page=1
+    // }
+    // let queryPage = page * 20;
+    // setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
+    console.log(nextPage, "nextPage")
+
     const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-    setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
     router.push(`/?page=${offset}`, undefined, { shallow: true });
     setCurrPage(nextPage);
   };
