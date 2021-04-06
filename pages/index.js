@@ -51,23 +51,20 @@ function Home() {
   }, [currPage]);
 
   const Next = () => {
-    // let page = Number(router.query.page);
-
     const parsedUrl = new URL(nextPage);
-    console.log("parsedUrl=",parsedUrl)
-    // if(page===0||page==="0"||!page){
-    //   page=1
-    // }
-    // let queryPage = page * 20;
-    // setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
-    console.log(nextPage, "nextPage")
-
     const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
     router.push(`/?page=${offset}`, undefined, { shallow: true });
     setCurrPage(nextPage);
   };
 
   const Prev = () => {
+    const parsedUrl = new URL(prevPage);
+    const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+    if(!offset||offset===0){
+      router.push(`/`, undefined, { shallow: true });
+    } else {
+      router.push(`/?page=${offset}`, undefined, { shallow: true });
+    }
     setCurrPage(prevPage);
   };
 
