@@ -7,16 +7,14 @@ function Home() {
   const [pokemonData, setPokemonData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const url = router.asPath;
-  const page = url === "/" ? 0 : router.query.page;
+  const page = router.query.page
 
   // I get page == undefined the first time even if page query is providen
   // it causes double fetching
-  // this is why I'm using url variable
-  // will check this later why this happen
+  // this is why I'm using router.isReady
 
   useEffect(() => {
-    if (page === undefined) {
+    if (!router.isReady) {
       setIsLoading(false);
       return;
     }
@@ -50,7 +48,7 @@ function Home() {
       setIsLoading(false);
     }
     getData();
-  }, [page]);
+  }, [page, router.isReady]);
 
   // it will be better if we show a spinner under the buttons next and prev rather then 
   // removing the container
