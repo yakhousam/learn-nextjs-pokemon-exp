@@ -26,8 +26,6 @@ function Home() {
 
   useEffect(() => {
     console.log('useeffect a;sjdf;lskdfjlkj!!!')
-    if(!ready) return
-
     setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
@@ -66,10 +64,13 @@ function Home() {
         console.log('err',err);
       }
     }
-    
+    if(!ready){
+      return null
+    } else{
       getData(page);
 
-  }, [currPage, page, ready]);
+    }
+  }, [page, ready]);
 
   const Next = () => {
     const parsedUrl = new URL(nextPage);
