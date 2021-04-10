@@ -4,7 +4,6 @@ import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
-  // const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNextPage] = useState();
   const [currPage, setCurrPage] = useState();
@@ -14,32 +13,22 @@ function Home() {
   let ready= router.isReady;
 
 
-  // useEffect(() => {
-  //   console.log('*****top level useEffect run page*****', page)
-  //   if(page&&page!==0){
-  //     const thePage=page*20
-  //     setCurrPage(`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`);
-  //     console.log('page is not eual to zero and ezists')
-  //   }
-  // }, [page]);
-
-
   useEffect(() => {
-    console.log('useeffect a;sjdf;lskdfjlkj!!!')
     setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData(page) {
       try {
-        // console.log("*****useEffect run with currPage******",currPage);
         let res;
+        let initialPage="https://pokeapi.co/api/v2/pokemon";
           if(page>=1){
             const thePage=page*20
-            const initialPage=`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`
+            initialPage=`${initialPage}?offset=${thePage}&limit=20`
             setCurrPage(initialPage);
             res=await fetch(initialPage);
           } else if(isNaN(page)){
-            res = await fetch("https://pokeapi.co/api/v2/pokemon");
+            setCurrPage(initialPage);
+            res = await fetch(initialPage);
           } else {
             return null;
           }
@@ -73,6 +62,10 @@ function Home() {
   }, [page, ready]);
 
   const Next = () => {
+    console.log("******************")
+    console.log(router, 'router')
+    console.log(nextPage, 'nextPage')
+    console.log(currPage, 'currPage')
     const parsedUrl = new URL(nextPage);
     const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
     router.push(`/?page=${offset}`, undefined, { shallow: true });
