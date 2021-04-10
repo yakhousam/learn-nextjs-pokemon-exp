@@ -26,21 +26,22 @@ function Home() {
 
   useEffect(() => {
     console.log('useeffect a;sjdf;lskdfjlkj!!!')
-    console.log(ready, 'ready')
     setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
-    async function getData() {
+    async function getData(page) {
       try {
         // console.log("*****useEffect run with currPage******",currPage);
         let res;
-          if(page){
+          if(page>=1){
             const thePage=page*20
             const initialPage=`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`
             setCurrPage(initialPage);
             res=await fetch(initialPage);
-          } else {
+          } else if(isNaN(page)){
             res = await fetch("https://pokeapi.co/api/v2/pokemon");
+          } else {
+            return null;
           }
           const pokemons = await res.json();
           setPrev(pokemons.previous);
@@ -66,8 +67,7 @@ function Home() {
     if(!ready){
       return null
     } else{
-      console.log('hi')
-      getData();
+      getData(page);
 
     }
   }, [currPage, page, ready]);
