@@ -3,11 +3,10 @@ import { useRouter } from "next/router";
 import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
 function Home() {
+  let initialPage="https://pokeapi.co/api/v2/pokemon";
   const router = useRouter();
   const [pokemonData, setPokemonData] = useState([]);
-  // const [nextPage, setNextPage] = useState();
   const [currPage, setCurrPage] = useState();
-  const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
   let page = Number(router.query.page);
   let ready= router.isReady;
@@ -20,7 +19,6 @@ function Home() {
     async function getData(page) {
       try {
         let res;
-        let initialPage="https://pokeapi.co/api/v2/pokemon";
           if(page>=1){
             const thePage=page*20
             initialPage=`${initialPage}?offset=${thePage}&limit=20`
@@ -33,8 +31,6 @@ function Home() {
             return null;
           }
           const pokemons = await res.json();
-          setPrev(pokemons.previous);
-          // setNextPage(pokemons.next);
           const { results } = pokemons;
           for (const value of results) {
             const result = await fetch(value.url);
@@ -62,31 +58,20 @@ function Home() {
   }, [page, ready]);
 
   const Next = () => {
-    // console.log("******************")
-    let initialPage="https://pokeapi.co/api/v2/pokemon";  
-    const nextPageNumber=Number(router.query.page?router.query.page:0)+1;
-    // console.log(nextPageNumber)
-    // console.log(nextPageNumber)
-    // console.log(nextPage, 'nextPage')
-    // console.log(currPage, 'currPage')
-    // const parsedUrl = new URL(nextPage);
-    // const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-    // https://pokeapi.co/api/v2/pokemon?offset=80&limit=20 nextPage
-    // https://pokeapi.co/api/v2/pokemon?offset=60&limit=20 currPage
+    const nextPageNumber=(page?page:0)+1;
     router.push(`/?page=${nextPageNumber}`, undefined, { shallow: true });
     setCurrPage(`${initialPage}?offset=${nextPageNumber*20}&limit=20`);
     
   };
 
   const Prev = () => {
-    const parsedUrl = new URL(prevPage);
-    const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+    const offset=(page?page:0)-1;
     if(!offset||offset===0){
       router.push(`/`, undefined, { shallow: true });
     } else {
       router.push(`/?page=${offset}`, undefined, { shallow: true });
     }
-    setCurrPage(prevPage);
+    setCurrPage(`${initialPage}?offset=${offset*20}&limit=20`);
   };
 
   if (isLoading) return "Loading the pokemons";
@@ -96,7 +81,7 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <Pagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <Pagination Next={Next} Prev={Prev} prevPage={page} />
           <PokemonList pokemonData={pokemonData} />
         </div>
       </main>
