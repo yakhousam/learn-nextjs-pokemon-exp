@@ -5,7 +5,7 @@ import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNextPage] = useState();
+  // const [nextPage, setNextPage] = useState();
   const [currPage, setCurrPage] = useState();
   const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +34,7 @@ function Home() {
           }
           const pokemons = await res.json();
           setPrev(pokemons.previous);
-          setNextPage(pokemons.next);
+          // setNextPage(pokemons.next);
           const { results } = pokemons;
           for (const value of results) {
             const result = await fetch(value.url);
@@ -62,14 +62,20 @@ function Home() {
   }, [page, ready]);
 
   const Next = () => {
-    console.log("******************")
-    console.log(router, 'router')
-    console.log(nextPage, 'nextPage')
-    console.log(currPage, 'currPage')
-    const parsedUrl = new URL(nextPage);
-    const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-    router.push(`/?page=${offset}`, undefined, { shallow: true });
-    setCurrPage(nextPage);
+    // console.log("******************")
+    let initialPage="https://pokeapi.co/api/v2/pokemon";  
+    const nextPageNumber=Number(router.query.page?router.query.page:0)+1;
+    // console.log(nextPageNumber)
+    // console.log(nextPageNumber)
+    // console.log(nextPage, 'nextPage')
+    // console.log(currPage, 'currPage')
+    // const parsedUrl = new URL(nextPage);
+    // const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
+    // https://pokeapi.co/api/v2/pokemon?offset=80&limit=20 nextPage
+    // https://pokeapi.co/api/v2/pokemon?offset=60&limit=20 currPage
+    router.push(`/?page=${nextPageNumber}`, undefined, { shallow: true });
+    setCurrPage(`${initialPage}?offset=${nextPageNumber*20}&limit=20`);
+    
   };
 
   const Prev = () => {
