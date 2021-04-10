@@ -7,53 +7,70 @@ function Home() {
   // const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
   const [nextPage, setNextPage] = useState();
-  const [currPage, setCurrPage] = useState("https://pokeapi.co/api/v2/pokemon");
+  const [currPage, setCurrPage] = useState();
   const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  // console.log('*****router query*****', router.query)
   let page = Number(router.query.page);
+  let ready= router.isReady;
+
+
+  // useEffect(() => {
+  //   console.log('*****top level useEffect run page*****', page)
+  //   if(page&&page!==0){
+  //     const thePage=page*20
+  //     setCurrPage(`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`);
+  //     console.log('page is not eual to zero and ezists')
+  //   }
+  // }, [page]);
 
 
   useEffect(() => {
-    console.log('*****top level useEffect run page*****', page)
-    if(page&&page!==0){
-      const thePage=page*20
-      setCurrPage(`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`);
-      console.log('page is not eual to zero and ezists')
-    }
-  }, [page]);
-
-
-  useEffect(() => {
+    console.log('useeffect a;sjdf;lskdfjlkj!!!')
+    console.log(ready, 'ready')
     setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const holder = [];
     async function getData() {
       try {
-        console.log("*****useEffect run with currPage******",currPage);
-        const res = await fetch(currPage);
-        const pokemons = await res.json();
-        setPrev(pokemons.previous);
-        setNextPage(pokemons.next);
-        const { results } = pokemons;
-        for (const value of results) {
-          const result = await fetch(value.url);
-          const pokemon = await result.json();
-          holder.push({
-            number: pokemon.id,
-            name: pokemon.name,
-            image_url: imgUrl + pokemon.id + ".png",
-            types: pokemon.types,
-          });
-        }
-        setPokemonData(holder);
-        setIsLoading(false);
+        // console.log("*****useEffect run with currPage******",currPage);
+        let res;
+          if(page){
+            const thePage=page*20
+            const initialPage=`https://pokeapi.co/api/v2/pokemon?offset=${thePage}&limit=20`
+            setCurrPage(initialPage);
+            res=await fetch(initialPage);
+          } else {
+            res = await fetch("https://pokeapi.co/api/v2/pokemon");
+          }
+          const pokemons = await res.json();
+          setPrev(pokemons.previous);
+          setNextPage(pokemons.next);
+          const { results } = pokemons;
+          for (const value of results) {
+            const result = await fetch(value.url);
+            const pokemon = await result.json();
+            holder.push({
+              number: pokemon.id,
+              name: pokemon.name,
+              image_url: imgUrl + pokemon.id + ".png",
+              types: pokemon.types,
+            });
+          }
+          setPokemonData(holder);
+          setIsLoading(false);
+        
       } catch (err) {
         console.log('err',err);
       }
     }
-    getData();
-  }, [currPage, page]);
+    if(!ready){
+      return null
+    } else{
+      console.log('hi')
+      getData();
+
+    }
+  }, [currPage, page, ready]);
 
   const Next = () => {
     const parsedUrl = new URL(nextPage);
