@@ -20,6 +20,7 @@ function Home() {
       try {
         let res;
           if(page>=1){
+            let initialPage="https://pokeapi.co/api/v2/pokemon";
             const thePage=page*20
             initialPage=`${initialPage}?offset=${thePage}&limit=20`
             setCurrPage(initialPage);
@@ -55,7 +56,7 @@ function Home() {
       getData(page);
 
     }
-  }, [page, ready]);
+  }, [page, ready, initialPage]);
 
   const Next = () => {
     const nextPageNumber=(page?page:0)+1;
