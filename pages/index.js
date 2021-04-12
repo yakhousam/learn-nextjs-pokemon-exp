@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
 function Home() {
-  let initialPage="https://pokeapi.co/api/v2/pokemon";
   const router = useRouter();
   const [pokemonData, setPokemonData] = useState([]);
   const [currPage, setCurrPage] = useState();
@@ -15,6 +14,8 @@ function Home() {
   useEffect(() => {
     setIsLoading(true)
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
+    //set state object with holder with the results returned from fetch url,
+    //for each result returned push a new pokemon into the holder array
     const holder = [];
     async function getData(page) {
       try {
@@ -26,6 +27,7 @@ function Home() {
             setCurrPage(initialPage);
             res=await fetch(initialPage);
           } else if(isNaN(page)){
+            let initialPage="https://pokeapi.co/api/v2/pokemon";
             setCurrPage(initialPage);
             res = await fetch(initialPage);
           } else {
@@ -56,9 +58,10 @@ function Home() {
       getData(page);
 
     }
-  }, [page, ready, initialPage]);
+  }, [page, ready]);
 
   const Next = () => {
+    let initialPage="https://pokeapi.co/api/v2/pokemon";
     const nextPageNumber=(page?page:0)+1;
     router.push(`/?page=${nextPageNumber}`, undefined, { shallow: true });
     setCurrPage(`${initialPage}?offset=${nextPageNumber*20}&limit=20`);
@@ -66,6 +69,7 @@ function Home() {
   };
 
   const Prev = () => {
+    let initialPage="https://pokeapi.co/api/v2/pokemon";
     const offset=(page?page:0)-1;
     if(!offset||offset===0){
       router.push(`/`, undefined, { shallow: true });
