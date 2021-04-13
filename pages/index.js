@@ -7,7 +7,7 @@ function Home() {
   const [pokemonData, setPokemonData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const page = router.query.page
+  const page = router.query.page || 0;
 
   // I get page == undefined the first time even if page query is providen
   // it causes double fetching
@@ -50,7 +50,7 @@ function Home() {
     getData();
   }, [page, router.isReady]);
 
-  // it will be better if we show a spinner under the buttons next and prev rather then 
+  // it will be better if we show a spinner under the buttons next and prev rather then
   // removing the container
   if (isLoading) return "Loading the pokemons";
 
