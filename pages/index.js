@@ -17,13 +17,17 @@ function Home() {
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const arrayOfPokemons = [];
     async function getData(page) {
+  
       try {
-        const res =
-          page >= 1
-            ? await fetch(
-                `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
-              )
-            : await fetch("https://pokeapi.co/api/v2/pokemon");
+        page=isNaN(page)?0:page
+        const res = await fetch(
+            `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
+          )
+          // page >= 1
+          //   ? await fetch(
+          //       `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
+          //     )
+          //   : await fetch("https://pokeapi.co/api/v2/pokemon");
         const pokemons = await res.json();
         const { results } = pokemons;
         for (const value of results) {
