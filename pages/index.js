@@ -10,6 +10,9 @@ function Home() {
   let ready = router.isReady;
 
   useEffect(() => {
+    if (!ready) {
+      return null;
+    }
     setIsLoading(true);
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
     const arrayOfPokemons = [];
@@ -38,9 +41,6 @@ function Home() {
       } catch (err) {
         console.log("err", err);
       }
-    }
-    if (!ready) {
-      return null;
     }
     getData(page);
   }, [page, ready]);
