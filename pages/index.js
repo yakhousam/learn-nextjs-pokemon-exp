@@ -4,69 +4,63 @@ import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
-  const initialPage = "https://pokeapi.co/api/v2/pokemon";
   const [pokemonData, setPokemonData] = useState([]);
-  const [nextPage, setNextPage] = useState();
-  const [currPage, setCurrPage] = useState(initialPage);
-  const [prevPage, setPrev] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  let page = Number(router.query.page);
+  let ready = router.isReady;
 
   useEffect(() => {
-    setIsLoading(true);
-    let page = Number(router.query.page);
-    console.log("page= ", page);
-    if (page && page !== 0) {
-      console.log("page was changed");
-      let queryPage = page * 20;
-      console.log(
-        `${initialPage}?offset=${queryPage}&limit=20`,
-        "querypage to change to"
-      );
-      setCurrPage(`${initialPage}?offset=${queryPage}&limit=20`);
+    if (!ready) {
+      return null;
     }
-  }, [router.query]);
-
-  useEffect(() => {
+    setIsLoading(true);
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-    const holder = [];
-    async function getData() {
+    const arrayOfPokemons = [];
+    async function getData(page) {
+  
       try {
-        console.log(router.query, "router query params");
-        console.log(currPage, "currPage");
-        const res = await fetch(currPage);
+        page=isNaN(page)?0:page
+        const res = await fetch(
+            `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
+          )
+          // page >= 1
+          //   ? await fetch(
+          //       `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
+          //     )
+          //   : await fetch("https://pokeapi.co/api/v2/pokemon");
         const pokemons = await res.json();
-        setPrev(pokemons.previous);
-        setNextPage(pokemons.next);
-        const parsedUrl = new URL(currPage);
-        const offset = Number(parsedUrl.searchParams.get("offset")) / 20;
-        router.push(`/?page=${offset}`, undefined, { shallow: true });
-
         const { results } = pokemons;
         for (const value of results) {
           const result = await fetch(value.url);
           const pokemon = await result.json();
-          holder.push({
+          arrayOfPokemons.push({
             number: pokemon.id,
             name: pokemon.name,
             image_url: imgUrl + pokemon.id + ".png",
             types: pokemon.types,
           });
         }
-        setPokemonData(holder);
+        setPokemonData(arrayOfPokemons);
         setIsLoading(false);
       } catch (err) {
-        console.log(err);
+        console.log("err", err);
       }
     }
-    getData();
-  }, [currPage]);
+    getData(page);
+  }, [page, ready]);
 
   const Next = () => {
-    setCurrPage(nextPage);
+    const nextPageNumber = (page ? page : 0) + 1;
+    router.push(`/?page=${nextPageNumber}`, undefined, { shallow: true });
   };
 
   const Prev = () => {
-    setCurrPage(prevPage);
+    const offset = (page ? page : 0) - 1;
+    if (!offset || offset === 0) {
+      router.push(`/`, undefined, { shallow: true });
+    } else {
+      router.push(`/?page=${offset}`, undefined, { shallow: true });
+    }
   };
 
   if (isLoading) return "Loading the pokemons";
@@ -76,7 +70,7 @@ function Home() {
         <h1 className="title">Pokiemons</h1>
         <p className="description">click on a pokemon to view his page</p>
         <div className="">
-          <Pagination Next={Next} Prev={Prev} prevPage={prevPage} />
+          <Pagination Next={Next} Prev={Prev} prevPage={page} />
           <PokemonList pokemonData={pokemonData} />
         </div>
       </main>
