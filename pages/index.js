@@ -5,78 +5,58 @@ import Pagination from "../components/Pagination";
 function Home() {
   const router = useRouter();
   const [pokemonData, setPokemonData] = useState([]);
-  const [currPage, setCurrPage] = useState();
   const [isLoading, setIsLoading] = useState(true);
   let page = Number(router.query.page);
-  let ready= router.isReady;
-
+  let ready = router.isReady;
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     const imgUrl = "https://pokeres.bastionbot.org/images/pokemon/";
-    //set state object with holder with the results returned from fetch url,
-    //for each result returned push a new pokemon into the holder array
-    const holder = [];
+    const arrayOfPokemons = [];
     async function getData(page) {
       try {
-        let res;
-          if(page>=1){
-            let initialPage="https://pokeapi.co/api/v2/pokemon";
-            const thePage=page*20
-            initialPage=`${initialPage}?offset=${thePage}&limit=20`
-            setCurrPage(initialPage);
-            res=await fetch(initialPage);
-          } else if(isNaN(page)){
-            let initialPage="https://pokeapi.co/api/v2/pokemon";
-            setCurrPage(initialPage);
-            res = await fetch(initialPage);
-          } else {
-            return null;
-          }
-          const pokemons = await res.json();
-          const { results } = pokemons;
-          for (const value of results) {
-            const result = await fetch(value.url);
-            const pokemon = await result.json();
-            holder.push({
-              number: pokemon.id,
-              name: pokemon.name,
-              image_url: imgUrl + pokemon.id + ".png",
-              types: pokemon.types,
-            });
-          }
-          setPokemonData(holder);
-          setIsLoading(false);
-        
+        const res =
+          page >= 1
+            ? await fetch(
+                `https://pokeapi.co/api/v2/pokemon?offset=${page * 20}&limit=20`
+              )
+            : await fetch("https://pokeapi.co/api/v2/pokemon");
+        const pokemons = await res.json();
+        const { results } = pokemons;
+        for (const value of results) {
+          const result = await fetch(value.url);
+          const pokemon = await result.json();
+          arrayOfPokemons.push({
+            number: pokemon.id,
+            name: pokemon.name,
+            image_url: imgUrl + pokemon.id + ".png",
+            types: pokemon.types,
+          });
+        }
+        setPokemonData(arrayOfPokemons);
+        setIsLoading(false);
       } catch (err) {
-        console.log('err',err);
+        console.log("err", err);
       }
     }
-    if(!ready){
-      return null
-    } else{
-      getData(page);
-
+    if (!ready) {
+      return null;
     }
+    getData(page);
   }, [page, ready]);
 
   const Next = () => {
-    let initialPage="https://pokeapi.co/api/v2/pokemon";
-    const nextPageNumber=(page?page:0)+1;
+    const nextPageNumber = (page ? page : 0) + 1;
     router.push(`/?page=${nextPageNumber}`, undefined, { shallow: true });
-    setCurrPage(`${initialPage}?offset=${nextPageNumber*20}&limit=20`);
-    
   };
 
   const Prev = () => {
-    let initialPage="https://pokeapi.co/api/v2/pokemon";
-    const offset=(page?page:0)-1;
-    if(!offset||offset===0){
+    const offset = (page ? page : 0) - 1;
+    if (!offset || offset === 0) {
       router.push(`/`, undefined, { shallow: true });
     } else {
       router.push(`/?page=${offset}`, undefined, { shallow: true });
     }
-    setCurrPage(`${initialPage}?offset=${offset*20}&limit=20`);
   };
 
   if (isLoading) return "Loading the pokemons";
